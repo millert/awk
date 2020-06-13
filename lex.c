@@ -560,15 +560,15 @@ void startreg(void)	/* next call to yylex will return a regular expression */
 
 int regexpr(void)
 {
-	int c;
+	int c, openclass = 0;
 	static char *buf = NULL;
 	static int bufsz = 500;
-	char *bp;
+	char *bp, *cstart;
 
 	if (buf == NULL && (buf = (char *) malloc(bufsz)) == NULL)
 		FATAL("out of space for reg expr");
 	bp = buf;
-	for ( ; (c = input()) != '/' && c != 0; ) {
+	for ( ; ((c = input()) != '/' || openclass > 0) && c != 0; ) {
 		if (!adjbuf(&buf, &bufsz, bp-buf+3, 500, &bp, "regexpr"))
 			FATAL("out of space for reg expr %.10s...", buf);
 		if (c == '\n') {
@@ -580,6 +580,29 @@ int regexpr(void)
 			*bp++ = '\\';
 			*bp++ = input();
 		} else {
+			/*
+			 * POSIX requires a slash in a regexp to be escaped,
+			 * other awks don't require it to be escaped inside
+			 * a character class.
+			 */
+			if (!do_posix) {
+				if (c == '[') {
+					int nextc = peek();
+					if (openclass == 0 || nextc == ':' ||
+					    nextc == '.' || nextc == '=') {
+						if (++openclass == 1)
+							cstart = bp;
+					}
+				} else if (c == ']' && openclass > 0) {
+					/*
+					 * A ']' as the first char in a
+					 * class is treated literally.
+					 */
+					if (cstart != bp - 1 &&
+					    (cstart != bp - 2 || bp[-1] != '^'))
+						openclass--;
+				}
+			}
 			*bp++ = c;
 		}
 	}
