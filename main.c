@@ -49,7 +49,8 @@ static size_t	maxpfile;	/* max program filename */
 static size_t	npfile;		/* number of filenames */
 static size_t	curpfile;	/* current filename */
 
-bool	safe = false;	/* true => "safe" mode */
+bool	safe = false;		/* true => "safe" mode */
+bool	do_posix = false;	/* true => POSIX mode */
 
 static noreturn void fpecatch(int n
 #ifdef SA_SIGINFO
@@ -139,6 +140,8 @@ int main(int argc, char *argv[])
 	/* Set and keep track of the random seed */
 	srand_seed = 1;
 	srandom((unsigned long) srand_seed);
+
+	do_posix = (getenv("POSIXLY_CORRECT") != NULL);
 
 	yyin = NULL;
 	symtab = makesymtab(NSYMTAB/NSYMTAB);
