@@ -60,6 +60,7 @@ extern enum compile_states {
 } compile_time;
 
 extern bool	safe;		/* false => unsafe, true => safe */
+extern bool	do_posix;	/* true if POSIXLY_CORRECT set */
 
 #define	RECSIZE	(8 * 1024)	/* sets limit on records, fields, etc., etc. */
 extern int	recsize;	/* size of current record, orig RECSIZE */
