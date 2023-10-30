@@ -31,6 +31,7 @@ const char	*version = "version 20250116";
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
 #include "awk.h"
 
 extern	char	**environ;
@@ -140,6 +141,13 @@ int main(int argc, char *argv[])
 	setlocale(LC_NUMERIC, "C"); /* for parsing cmdline & prog */
 	awk_mb_cur_max = MB_CUR_MAX;
 	cmdname = argv[0];
+
+	if (pledge("stdio rpath wpath cpath proc exec", NULL) == -1) {
+		fprintf(stderr, "%s: pledge: incorrect arguments\n",
+		    cmdname);
+		exit(1);
+	}
+
 	if (argc == 1) {
 		fprintf(stderr, "usage: %s [-safe] [-V] [-d[n]] "
 		    "[-f fs | --csv] [-v var=value]\n"
@@ -219,6 +227,14 @@ int main(int argc, char *argv[])
 		}
 		argc--;
 		argv++;
+	}
+
+	if (safe) {
+		if (pledge("stdio rpath", NULL) == -1) {
+			fprintf(stderr, "%s: pledge: incorrect arguments\n",
+			    cmdname);
+			exit(1);
+		}
 	}
 
 	if (CSV && (fs != NULL || lookup("FS", symtab) != NULL))
