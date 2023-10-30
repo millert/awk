@@ -790,8 +790,6 @@ void eprint(void)	/* try to print context around error */
 
 	if (compile_time != COMPILING || been_here++ > 0 || ebuf == ep)
 		return;
-	if (ebuf == ep)
-		return;
 	p = ep - 1;
 	if (p > ebuf && *p == '\n')
 		p--;
