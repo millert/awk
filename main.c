@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 			fn = getarg(&argc, &argv, "no program filename");
 			if (npfile >= maxpfile) {
 				maxpfile += 20;
-				pfile = (char **) realloc(pfile, maxpfile * sizeof(*pfile));
+				pfile = (char **) reallocarray(pfile, maxpfile, sizeof(*pfile));
 				if (pfile == NULL)
 					FATAL("error allocating space for -f options");
  			}

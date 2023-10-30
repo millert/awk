@@ -276,7 +276,7 @@ Cell *call(Node **a, int n)	/* function call.  very kludgy and fragile */
 	frp++;	/* now ok to up frame */
 	if (frp >= frame + nframe) {
 		int dfp = frp - frame;	/* old index */
-		frame = (struct Frame *) realloc(frame, (nframe += 100) * sizeof(*frame));
+		frame = (struct Frame *) reallocarray(frame, (nframe += 100), sizeof(*frame));
 		if (frame == NULL)
 			FATAL("out of space for stack frames in %s", s);
 		frp = frame + dfp;
@@ -2265,8 +2265,9 @@ Cell *bltin(Node **a, int n)	/* builtin functions. a[0] is type, a[1] is arg lis
 		sz = 32;
 		buf = NULL;
 		do {
-			if ((buf = realloc(buf, (sz *= 2))) == NULL)
+			if ((buf = (char *) reallocarray(buf, 2, sz)) == NULL)
 				FATAL("out of memory in strftime");
+			sz *= 2;
 		} while (strftime(buf, sz, fmt, tm) == 0 && fmt[0] != '\0');
 
 		y = gettemp();
@@ -2391,7 +2392,7 @@ FILE *openfile(int a, const char *us, bool *pnewflag)
 	if (i >= nfiles) {
 		struct files *nf;
 		size_t nnf = nfiles + FOPEN_MAX;
-		nf = (struct files *) realloc(files, nnf * sizeof(*nf));
+		nf = (struct files *) reallocarray(files, nnf, sizeof(*nf));
 		if (nf == NULL)
 			FATAL("cannot grow files for %s and %zu files", s, nnf);
 		memset(&nf[nfiles], 0, FOPEN_MAX * sizeof(*nf));
