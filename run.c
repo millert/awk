@@ -1232,7 +1232,7 @@ int format(char **pbuf, int *pbufsize, const char *s, Node *a)	/* printf-like co
 				if (f[0] == '0')
 					f++;
 			}
-			if (isdigit(f[0])) { /* there is a wid */
+			if (isdigit((uschar)f[0])) { /* there is a wid */
 				wid = strtol(f, &f, 10);
 			}
 			if (f[0] == '.') { /* there is a .prec */
@@ -1334,7 +1334,7 @@ int format(char **pbuf, int *pbufsize, const char *s, Node *a)	/* printf-like co
 				if (f[0] == '0')
 					f++;
 			}
-			if (isdigit(f[0])) { /* there is a wid */
+			if (isdigit((uschar)f[0])) { /* there is a wid */
 				wid = strtol(f, &f, 10);
 			}
 			if (f[0] == '.') { /* there is a .prec */
