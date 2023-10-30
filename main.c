@@ -159,10 +159,6 @@ int main(int argc, char *argv[])
 #endif
 	/*signal(SIGSEGV, segvcatch); experiment */
 
-	/* Set and keep track of the random seed */
-	srand_seed = 1;
-	srandom((unsigned long) srand_seed);
-
 	do_posix = (getenv("POSIXLY_CORRECT") != NULL);
 
 	yyin = NULL;
