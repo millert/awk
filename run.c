@@ -2191,12 +2191,15 @@ Cell *bltin(Node **a, int n)	/* builtin functions. a[0] is type, a[1] is arg lis
 		u = (Awkfloat) random() / (0x7fffffffL + 0x1UL);
 		break;
 	case FSRAND:
-		if (isrec(x))	/* no argument provided */
-			u = time((time_t *)0);
-		else
+		if (isrec(x)) {		/* no argument provided */
+			u = time(NULL);
+			tmp = u;
+			srandom((unsigned int) u);
+		} else {
 			u = getfval(x);
-		tmp = u;
-		srandom((unsigned long) u);
+			tmp = u;
+			srandom_deterministic((unsigned int) u);
+		}
 		u = srand_seed;
 		srand_seed = tmp;
 		break;
