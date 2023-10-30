@@ -1670,12 +1670,13 @@ Cell *split(Node **a, int nnn)	/* split(a[0], a[1], a[2]); a[3] is type */
 	char *origfs = NULL;
 	int sep;
 	char temp, num[50];
-	int n, tempstat, arg3type;
-	int j;
+	int j, n, tempstat, arg3type;
 	double result;
 
 	y = execute(a[0]);	/* source string */
 	origs = s = strdup(getsval(y));
+	if (s == NULL)
+		FATAL("out of space in split");
 	tempfree(y);
 	arg3type = ptoi(a[3]);
 	if (a[2] == NULL) {		/* BUG: CSV should override implicit fs but not explicit */
@@ -1683,6 +1684,8 @@ Cell *split(Node **a, int nnn)	/* split(a[0], a[1], a[2]); a[3] is type */
 	} else if (arg3type == STRING) {	/* split(str,arr,"string") */
 		x = execute(a[2]);
 		fs = origfs = strdup(getsval(x));
+		if (fs == NULL)
+			FATAL("out of space in split");
 		tempfree(x);
 	} else if (arg3type == REGEXPR) {
 		fs = "(regexpr)";	/* split(str,arr,/regexpr/) */
@@ -2678,7 +2681,7 @@ Cell *gensub(Node **a, int nnn)	/* global selective substitute */
 	int mflag, tempstat, num, whichm;
 	int bufsz = recsize;
 
-	if ((buf = malloc(bufsz)) == NULL)
+	if ((buf = (char *) malloc(bufsz)) == NULL)
 		FATAL("out of memory in gensub");
 	mflag = 0;	/* if mflag == 0, can replace empty string */
 	num = 0;
