@@ -364,8 +364,6 @@ int hexstr(const uschar **pp, int max)	/* find and eval hex string at pp, return
 	return n;
 }
 
-
-
 #define isoctdigit(c) ((c) >= '0' && (c) <= '7')	/* multiple use of arg */
 
 int quoted(const uschar **pp)	/* pick up next thing after a \\ */
@@ -803,8 +801,8 @@ int pmatch(fa *f, const char *p0)	/* longest match, for sub */
 int nematch(fa *f, const char *p0)	/* non-empty match, for sub */
 {
 	int s, ns;
-        int n;
-        int rune;
+	int n;
+	int rune;
 	const uschar *p = (const uschar *) p0;
 	const uschar *q;
 
@@ -1111,7 +1109,6 @@ Node *unary(Node *np)
  * to nelson beebe for the suggestion; let's see if it works everywhere.
  */
 
-/* #define HAS_ISBLANK */
 #ifndef HAS_ISBLANK
 
 int (xisblank)(int c)

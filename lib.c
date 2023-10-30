@@ -247,7 +247,6 @@ int readrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag)	/* read one rec
 		if (found)
 			setptr(patbeg, '\0');
 		isrec = (found == 0 && *buf == '\0') ? false : true;
-
 	} else {
 		if ((sep = *rs) == 0) {
 			sep = '\n';
@@ -292,7 +291,6 @@ int readrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag)	/* read one rec
  *   what about bare \r?  Excel uses that for embedded newlines
  *   can't have "" in unquoted fields, according to RFC 4180
 */
-
 
 int readcsvrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag) /* csv can have \n's */
 {			/* so read a complete record that might be multiple lines */
@@ -927,7 +925,7 @@ convert:
 	if (no_trailing != NULL)
 		*no_trailing = (*ep == '\0');
 
-        /* return true if found the end, or trailing stuff is allowed */
+	/* return true if found the end, or trailing stuff is allowed */
 	retval = *ep == '\0' || trailing_stuff_ok;
 
 	return retval;
