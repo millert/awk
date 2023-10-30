@@ -119,7 +119,7 @@ void arginit(int ac, char **av)	/* set up ARGV and ARGC */
 	for (i = 0; i < ac; i++) {
 		double result;
 
-		sprintf(temp, "%d", i);
+		snprintf(temp, sizeof(temp), "%d", i);
 		if (is_number(*av, & result))
 			setsymtab(temp, *av, result, STR|NUM, ap);
 		else
@@ -423,7 +423,7 @@ static const char *get_inf_nan(double d)
 
 static char *get_str_val(Cell *vp, char **fmt)        /* get string val of a Cell */
 {
-	char s[256];
+	int n;
 	double dtemp;
 	const char *p;
 
@@ -463,12 +463,13 @@ static char *get_str_val(Cell *vp, char **fmt)        /* get string val of a Cel
 		if (freeable(vp)) \
 			xfree(vp->sval); \
 		if ((p = get_inf_nan(vp->fval)) != NULL) \
-			strcpy(s, p); \
+			n = (vp->sval = strdup(p)) ? 0 : -1; \
 		else if (modf(vp->fval, &dtemp) == 0)	/* it's integral */ \
-			snprintf(s, sizeof (s), "%.30g", vp->fval); \
+			n = asprintf(&vp->sval, "%.30g", vp->fval); \
 		else \
-			snprintf(s, sizeof (s), *fmt, vp->fval); \
-		vp->sval = tostring(s); \
+			n = asprintf(&vp->sval, *fmt, vp->fval); \
+		if (n == -1) \
+			FATAL("out of space in get_str_val"); \
 		vp->tval &= ~DONTFREE; \
 		vp->tval |= STR; \
 	}
@@ -537,8 +538,9 @@ char *tostringN(const char *s, size_t n)	/* make a copy of string s */
 
 	p = (char *) malloc(n);
 	if (p == NULL)
-		FATAL("out of space in tostring on %s", s);
-	strcpy(p, s);
+		FATAL("out of space in tostringN %zu", n);
+	if (strlcpy(p, s, n) >= n)
+		FATAL("out of space in tostringN on %s", s);
 	return(p);
 }
 
@@ -634,15 +636,16 @@ const char *flags2str(int flags)
 		{ NULL, 0 }
 	};
 	static char buf[100];
-	int i;
+	int i, len;
 	char *cp = buf;
 
 	for (i = 0; flagtab[i].name != NULL; i++) {
 		if ((flags & flagtab[i].value) != 0) {
-			if (cp > buf)
-				*cp++ = '|';
-			strcpy(cp, flagtab[i].name);
-			cp += strlen(cp);
+			len = snprintf(cp, sizeof(buf) - (cp - buf),
+			    "%s%s", cp > buf ? "|" : "", flagtab[i].name);
+			if (len < 0 || len >= sizeof(buf) - (cp - buf))
+				FATAL("out of space in flags2str");
+			cp += len;
 		}
 	}
 
