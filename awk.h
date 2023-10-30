@@ -26,7 +26,7 @@ THIS SOFTWARE.
 #include <stdint.h>
 #include <stdbool.h>
 #if __STDC_VERSION__ <= 199901L
-#define noreturn
+#define noreturn __dead
 #else
 #include <stdnoreturn.h>
 #endif
