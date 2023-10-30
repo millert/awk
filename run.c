@@ -1694,7 +1694,7 @@ Cell *split(Node **a, int nnn)	/* split(a[0], a[1], a[2]); a[3] is type */
 	}
 	sep = *fs;
 	ap = execute(a[1]);	/* array name */
-/* BUG 7/26/22: this appears not to reset array: see C1/asplit */
+	/* BUG 7/26/22: this appears not to reset array: see C1/asplit */
 	freesymtab(ap);
 	DPRINTF("split: s=|%s|, a=%s, sep=|%s|\n", s, NN(ap->nval), fs);
 	ap->tval &= ~STR;
@@ -2055,8 +2055,6 @@ static char *nawk_tolower(const char *s)
 {
 	return nawk_convert(s, tolower, towlower);
 }
-
-
 
 Cell *bltin(Node **a, int n)	/* builtin functions. a[0] is type, a[1] is arg list */
 {
