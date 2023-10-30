@@ -850,10 +850,10 @@ int isclvar(const char *s)	/* is s of form var=something ? */
 {
 	const char *os = s;
 
-	if (!isalpha((int) *s) && *s != '_')
+	if (!isalpha((uschar)*s) && *s != '_')
 		return 0;
 	for ( ; *s; s++)
-		if (!(isalnum((int) *s) || *s == '_'))
+		if (!(isalnum((uschar)*s) || *s == '_'))
 			break;
 	return *s == '=' && s > os;
 }
@@ -888,11 +888,11 @@ bool is_valid_number(const char *s, bool trailing_stuff_ok,
 	if (no_trailing)
 		*no_trailing = false;
 
-	while (isspace((int) *s))
+	while (isspace((uschar)*s))
 		s++;
 
 	/* no hex floating point, sorry */
-	if (s[0] == '0' && tolower(s[1]) == 'x' && isxdigit(s[2]))
+	if (s[0] == '0' && tolower((uschar)s[1]) == 'x' && isxdigit((uschar)s[2]))
 		return false;
 
 	/* allow +nan, -nan, +inf, -inf, any other letter, no */
@@ -900,12 +900,12 @@ bool is_valid_number(const char *s, bool trailing_stuff_ok,
 		is_nan = (strncasecmp(s+1, "nan", 3) == 0);
 		is_inf = (strncasecmp(s+1, "inf", 3) == 0);
 		if ((is_nan || is_inf)
-		    && (isspace((int) s[4]) || s[4] == '\0'))
+		    && (isspace((uschar)s[4]) || s[4] == '\0'))
 			goto convert;
-		else if (! isdigit(s[1]) && s[1] != '.')
+		else if (! isdigit((uschar)s[1]) && s[1] != '.')
 			return false;
 	}
-	else if (! isdigit(s[0]) && s[0] != '.')
+	else if (! isdigit((uschar)s[0]) && s[0] != '.')
 		return false;
 
 convert:
@@ -923,7 +923,7 @@ convert:
 	/*
 	 * check for trailing stuff
 	 */
-	while (isspace((int) *ep))
+	while (isspace((uschar)*ep))
 		ep++;
 
 	if (no_trailing != NULL)
