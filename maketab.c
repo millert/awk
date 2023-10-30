@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 		names[tok-FIRSTTOKEN] = strdup(name);
 		if (names[tok-FIRSTTOKEN] == NULL) {
 			fprintf(stderr, "maketab out of space copying %s", name);
-			continue;
+			return 1;
 		}
 		printf("\t\"%s\",\t/* %d */\n", name, tok);
 		i++;
