@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 	do_posix = (getenv("POSIXLY_CORRECT") != NULL);
 
 	yyin = NULL;
-	symtab = makesymtab(NSYMTAB/NSYMTAB);
+	symtab = makesymtab(NSYMTAB);
 	while (argc > 1 && argv[1][0] == '-' && argv[1][1] != '\0') {
 		if (strcmp(argv[1], "-version") == 0 || strcmp(argv[1], "--version") == 0) {
 			printf("awk %s\n", version);
