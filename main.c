@@ -34,6 +34,7 @@ const char	*version = "version 20250116";
 #include <unistd.h>
 #include "awk.h"
 
+extern	char	*__progname;
 extern	char	**environ;
 extern	int	nfields;
 
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
 	setlocale(LC_CTYPE, "");
 	setlocale(LC_NUMERIC, "C"); /* for parsing cmdline & prog */
 	awk_mb_cur_max = MB_CUR_MAX;
-	cmdname = argv[0];
+	cmdname = __progname;
 
 	if (pledge("stdio rpath wpath cpath proc exec", NULL) == -1) {
 		fprintf(stderr, "%s: pledge: incorrect arguments\n",
