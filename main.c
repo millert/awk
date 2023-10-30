@@ -141,10 +141,10 @@ int main(int argc, char *argv[])
 	awk_mb_cur_max = MB_CUR_MAX;
 	cmdname = argv[0];
 	if (argc == 1) {
-		fprintf(stderr,
-		  "usage: %s [-F fs | --csv] [-v var=value] [-f progfile | 'prog'] [file ...]\n",
-		  cmdname);
-		exit(1);
+		fprintf(stderr, "usage: %s [-safe] [-V] [-d[n]] "
+		    "[-f fs | --csv] [-v var=value]\n"
+		    "\t   [prog | -f progfile] file ...\n", cmdname);
+		return 1;
 	}
 #ifdef SA_SIGINFO
 	{
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 	yyin = NULL;
 	symtab = makesymtab(NSYMTAB);
 	while (argc > 1 && argv[1][0] == '-' && argv[1][1] != '\0') {
-		if (strcmp(argv[1], "-version") == 0 || strcmp(argv[1], "--version") == 0) {
+		if (strcmp(argv[1], "--version") == 0) {
 			printf("awk %s\n", version);
 			return 0;
 		}
@@ -210,6 +210,9 @@ int main(int argc, char *argv[])
 				dbg = 1;
 			printf("awk %s\n", version);
 			break;
+		case 'V':
+			printf("awk %s\n", version);
+			return 0;
 		default:
 			WARNING("unknown option %s ignored", argv[1]);
 			break;
