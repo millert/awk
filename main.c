@@ -62,6 +62,7 @@ static noreturn void fpecatch(int n
 #endif
 )
 {
+	extern Node *curnode;
 #ifdef SA_SIGINFO
 	const char *mesg = NULL;
 
@@ -96,19 +97,34 @@ static noreturn void fpecatch(int n
 		break;
 	}
 #endif
-	FATAL("floating point exception"
+	dprintf(STDERR_FILENO, "floating point exception%s%s\n",
 #ifdef SA_SIGINFO
-		": %s", mesg
+		": ", mesg
+#else
+		"", ""
 #endif
 	    );
-}
 
-/* Can this work with recursive calls?  I don't think so.
-void segvcatch(int n)
-{
-	FATAL("segfault.  Do you have an unbounded recursive call?", n);
+	if (compile_time != 2 && NR && *NR > 0) {
+		dprintf(STDERR_FILENO, " input record number %d", (int) (*FNR));
+		if (strcmp(*FILENAME, "-") != 0) {
+			dprintf(STDERR_FILENO, ", file %s", *FILENAME);
+		}
+		dprintf(STDERR_FILENO, "\n");
+	}
+	if (compile_time != 2 && curnode) {
+		dprintf(STDERR_FILENO, " source line number %d", curnode->lineno);
+	} else if (compile_time != 2 && lineno) {
+		dprintf(STDERR_FILENO, " source line number %d", lineno);
+	}
+	if (compile_time == 1 && cursource() != NULL) {
+		dprintf(STDERR_FILENO, " source file %s", cursource());
+	}
+	dprintf(STDERR_FILENO, "\n");
+	if (dbg > 1)		/* core dump if serious debugging on */
+		abort();
+	_exit(2);
 }
-*/
 
 static const char *
 setfs(char *p)
@@ -165,7 +181,6 @@ int main(int argc, char *argv[])
 #else
 	(void)signal(SIGFPE, fpecatch);
 #endif
-	/*signal(SIGSEGV, segvcatch); experiment */
 
 	do_posix = (getenv("POSIXLY_CORRECT") != NULL);
 
