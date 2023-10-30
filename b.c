@@ -128,16 +128,23 @@ intalloc(size_t n, const char *f)
 }
 
 static void
-resizesetvec(const char *f)
+allocsetvec(const char *f)
 {
-	if (maxsetvec == 0)
-		maxsetvec = MAXLIN;
-	else
-		maxsetvec *= 4;
-	setvec = (int *) realloc(setvec, maxsetvec * sizeof(*setvec));
-	tmpset = (int *) realloc(tmpset, maxsetvec * sizeof(*tmpset));
+	maxsetvec = MAXLIN;
+	setvec = (int *) reallocarray(setvec, maxsetvec, sizeof(*setvec));
+	tmpset = (int *) reallocarray(tmpset, maxsetvec, sizeof(*tmpset));
 	if (setvec == NULL || tmpset == NULL)
 		overflo(f);
+}
+
+static void
+resizesetvec(const char *f)
+{
+	setvec = (int *) reallocarray(setvec, maxsetvec, 4 * sizeof(*setvec));
+	tmpset = (int *) reallocarray(tmpset, maxsetvec, 4 * sizeof(*tmpset));
+	if (setvec == NULL || tmpset == NULL)
+		overflo(f);
+	maxsetvec *= 4;
 }
 
 static void
@@ -153,17 +160,17 @@ resize_state(fa *f, int state)
 
 	new_count = state + 10; /* needs to be tuned */
 
-	p = (gtt *) realloc(f->gototab, new_count * sizeof(gtt));
+	p = (gtt *) reallocarray(f->gototab, new_count, sizeof(gtt));
 	if (p == NULL)
 		goto out;
 	f->gototab = p;
 
-	p2 = (uschar *) realloc(f->out, new_count * sizeof(f->out[0]));
+	p2 = (uschar *) reallocarray(f->out, new_count, sizeof(f->out[0]));
 	if (p2 == NULL)
 		goto out;
 	f->out = p2;
 
-	p3 = (int **) realloc(f->posns, new_count * sizeof(f->posns[0]));
+	p3 = (int **) reallocarray(f->posns, new_count, sizeof(f->posns[0]));
 	if (p3 == NULL)
 		goto out;
 	f->posns = p3;
@@ -190,7 +197,7 @@ fa *makedfa(const char *s, bool anchor)	/* returns dfa for reg expr s */
 	static int now = 1;
 
 	if (setvec == NULL) {	/* first time through any RE */
-		resizesetvec(__func__);
+		allocsetvec(__func__);
 	}
 
 	if (compile_time != RUNNING)	/* a constant for sure */
@@ -448,10 +455,10 @@ int *cclenter(const char *argp)	/* add a character class */
 				}
 				while (c < c2) {
 					if (i >= bufsz) {
-						bufsz *= 2;
-						buf = (int *) realloc(buf, bufsz * sizeof(int));
+						buf = (int *) reallocarray(buf, bufsz, 2 * sizeof(int));
 						if (buf == NULL)
 							FATAL("out of space for character class [%.10s...] 2", p);
+						bufsz *= 2;
 						bp = buf + i;
 					}
 					*bp++ = ++c;
@@ -461,10 +468,10 @@ int *cclenter(const char *argp)	/* add a character class */
 			}
 		}
 		if (i >= bufsz) {
-			bufsz *= 2;
-			buf = (int *) realloc(buf, bufsz * sizeof(int));
+			buf = (int *) reallocarray(buf, bufsz, 2 * sizeof(int));
 			if (buf == NULL)
 				FATAL("out of space for character class [%.10s...] 2", p);
+			bufsz *= 2;
 			bp = buf + i;
 		}
 		*bp++ = c;
