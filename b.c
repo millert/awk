@@ -892,7 +892,7 @@ bool fnematch(fa *pfa, FILE *f, char **pbuf, int *pbufsize, int quantum)
 		if (k - j < (int)awk_mb_cur_max) {
 			if (k + awk_mb_cur_max > buf + bufsize) {
 				char *obuf = buf;
-				adjbuf((char **) &buf, &bufsize,
+				adjbuf(&buf, &bufsize,
 				    bufsize + awk_mb_cur_max,
 				    quantum, 0, "fnematch");
 
@@ -1155,7 +1155,7 @@ replace_repeat(const uschar *reptok, int reptoklen, const uschar *atom,
 	       int atomlen, int firstnum, int secondnum, int special_case)
 {
 	int i, j;
-	uschar *buf = 0;
+	uschar *buf = NULL;
 	int ret = 1;
 	int init_q = (firstnum == 0);		/* first added char will be ? */
 	int n_q_reps = secondnum-firstnum;	/* m>n, so reduce until {1,m-n} left  */
