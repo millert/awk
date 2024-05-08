@@ -378,8 +378,6 @@ int yylex(void)
 	}
 }
 
-extern int runetochar(char *str, int c);
-
 int string(void)
 {
 	int c, n;
