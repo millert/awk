@@ -34,8 +34,6 @@ THIS SOFTWARE.
 #include <math.h>
 #include "awk.h"
 
-extern int u8_nextlen(const char *s);
-
 char	EMPTY[] = { '\0' };
 FILE	*infile	= NULL;
 bool	innew;		/* true = infile has not been read by readrec */
@@ -756,7 +754,7 @@ void WARNING(const char *fmt, ...)
 	error();
 }
 
-void error()
+void error(void)
 {
 	extern Node *curnode;
 

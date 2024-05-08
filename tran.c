@@ -643,7 +643,7 @@ const char *flags2str(int flags)
 		if ((flags & flagtab[i].value) != 0) {
 			len = snprintf(cp, sizeof(buf) - (cp - buf),
 			    "%s%s", cp > buf ? "|" : "", flagtab[i].name);
-			if (len < 0 || len >= sizeof(buf) - (cp - buf))
+			if (len < 0 || (size_t)len >= sizeof(buf) - (cp - buf))
 				FATAL("out of space in flags2str");
 			cp += len;
 		}

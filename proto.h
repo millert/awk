@@ -200,4 +200,8 @@ extern	Cell	*gensub(Node **, int);
 extern	FILE	*popen(const char *, const char *);
 extern	int	pclose(FILE *);
 
+extern	int	u8_nextlen(const char *s);
+extern	int	u8_rune(int *, const char *);
+extern	int	runetochar(char *str, int c);
+
 extern  const char	*flags2str(int flags);
