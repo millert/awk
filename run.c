@@ -600,7 +600,7 @@ Cell *intest(Node **a, int n)	/* a[0] is index (list), a[1] is symtab */
 
 /* is s the beginning of a valid utf-8 string? */
 /* return length 1..4 if yes, 0 if no */
-int u8_isutf(const char *s)
+static int u8_isutf(const char *s)
 {
 	int ret;
 	unsigned char c;
@@ -669,7 +669,7 @@ int u8_nextlen(const char *s)
 }
 
 /* return number of utf characters or single non-utf bytes */
-int u8_strlen(const char *s)
+static int u8_strlen(const char *s)
 {
 	int i, len, n, totlen;
 	unsigned char c;
@@ -691,7 +691,7 @@ int u8_strlen(const char *s)
 }
 
 /* convert utf-8 char number in a string to its byte offset */
-int u8_char2byte(const char *s, int charnum)
+static int u8_char2byte(const char *s, int charnum)
 {
 	int n;
 	int bytenum = 0;
@@ -706,7 +706,7 @@ int u8_char2byte(const char *s, int charnum)
 }
 
 /* convert byte offset in s to utf-8 char number that starts there */
-int u8_byte2char(const char *s, int bytenum)
+static int u8_byte2char(const char *s, int bytenum)
 {
 	int i, len, b;
 	int charnum = 0; /* BUG: what origin? */
@@ -1056,7 +1056,7 @@ Cell *sindex(Node **a, int nnn)		/* index(a[0], a[1]) */
 	return(z);
 }
 
-int has_utf8(char *s)	/* return 1 if s contains any utf-8 (2 bytes or more) character */
+static int has_utf8(char *s)	/* return 1 if s contains any utf-8 (2 bytes or more) character */
 {
 	int n;
 
@@ -1242,13 +1242,13 @@ int format(char **pbuf, int *pbufsize, const char *s, Node *a)	/* printf-like co
 			if (prec > u8_strlen(t))
 				prec = u8_strlen(t);
 			pad = wid>prec ? wid - prec : 0;  // has to be >= 0
-			int i, k, n;
+			int i, precb;
 			
 			if (ljust) { // print prec chars from t, then pad blanks
-				n = u8_char2byte(t, prec);
-				for (k = 0; k < n; k++) {
-					//putchar(t[k]);
-					*p++ = t[k];
+				precb = u8_char2byte(t, prec);
+				for (i = 0; i < precb; i++) {
+					//putchar(t[i]);
+					*p++ = t[i];
 				}
 				for (i = 0; i < pad; i++) {
 					//printf(" ");
@@ -1259,10 +1259,10 @@ int format(char **pbuf, int *pbufsize, const char *s, Node *a)	/* printf-like co
 					//printf(" ");
 					*p++ = ' ';
 				}
-				n = u8_char2byte(t, prec);
-				for (k = 0; k < n; k++) {
-					//putchar(t[k]);
-					*p++ = t[k];
+				precb = u8_char2byte(t, prec);
+				for (i = 0; i < precb; i++) {
+					//putchar(t[i]);
+					*p++ = t[i];
 				}
 			}
 			*p = 0;
@@ -1980,7 +1980,6 @@ static char *nawk_convert(const char *s, int (*fun_c)(int),
 	size_t n       = 0;
 	wchar_t wc;
 	const size_t sz = awk_mb_cur_max;
-	int unused;
 
 	if (sz == 1) {
 		buf = tostring(s);
@@ -1993,15 +1992,9 @@ static char *nawk_convert(const char *s, int (*fun_c)(int),
 		/* upper/lower character may be shorter/longer */
 		buf = tostringN(s, strlen(s) * sz + 1);
 
-		(void) mbtowc(NULL, NULL, 0);	/* reset internal state */
-		/*
-		 * Reset internal state here too.
-		 * Assign result to avoid a compiler warning. (Casting to void
-		 * doesn't work.)
-		 * Increment said variable to avoid a different warning.
-		 */
-		unused = wctomb(NULL, L'\0');
-		unused++;
+		/* reset internal state */
+		if (mbtowc(NULL, NULL, 0) == -1 || wctomb(NULL, L'\0') == -1)
+			FATAL("unable to reset character conversion state");
 
 		ps   = s;
 		pbuf = buf;
