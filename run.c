@@ -64,14 +64,11 @@ void tempfree(Cell *p) {
 /* #define FOPEN_MAX _NFILE */
 /* #endif */
 /* #endif */
-/*  */
+
 /* #ifndef	FOPEN_MAX */
 /* #define	FOPEN_MAX	40 */	/* max number of open files */
 /* #endif */
-/*  */
-/* #ifndef RAND_MAX */
-/* #define RAND_MAX	32767 */	/* all that ansi guarantees */
-/* #endif */
+
 
 jmp_buf env;
 extern	int	pairstack[];
@@ -2190,7 +2187,11 @@ Cell *bltin(Node **a, int n)	/* builtin functions. a[0] is type, a[1] is arg lis
 		/* random() returns numbers in [0..2^31-1]
 		 * in order to get a number in [0, 1), divide it by 2^31
 		 */
-		u = (Awkfloat) random() / RAND_MAX;
+		do {
+			/* exact if Awkfloat wide enough */
+			u = (Awkfloat) random();
+			u /= 0x80000000;  /* should be exact */
+		} while (u >= 1.0);	  /* in case Awkfloat is narrow */
 		break;
 	case FSRAND:
 		if (isrec(x))	/* no argument provided */
