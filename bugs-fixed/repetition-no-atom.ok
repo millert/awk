@@ -1,4 +1,4 @@
-awk: illegal primary in regular expression {00} at 
- source line number 1 source file /usr/src/local/Languages/Awk/awk/bugs-fixed/repetition-no-atom.awk
+../a.out: illegal primary in regular expression {00} at 
+ source line number 1 source file repetition-no-atom.awk
  context is
 	 >>> /{00}/ <<< 
