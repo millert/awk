@@ -25,6 +25,12 @@ THIS SOFTWARE.
 This file lists all bug fixes, changes, etc., made since the 
 second edition of the AWK book was published in September 2023.
 
+Apr 26, 2026
+	regex fixes: limit the repetition count to 255 like
+	POSIX does to prevent signed integer overflow.
+	prevent a crash when the repetition is the first atom parsed
+	Thanks to Renaud Allard an Todd Miller.
+
 Dec 24, 2025
 	Previously changed and broken rand() implementation
 	restored in run.c with a variant thanks to Henry Spencer.
